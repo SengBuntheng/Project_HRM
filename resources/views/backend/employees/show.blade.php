@@ -31,12 +31,15 @@
                         <div class="card-header">
                             <h3 class="card-title">Employee Details</h3>
                             <div class="card-tools">
-                                <a href="{{ route('employee.edit', $employee->id) }}" class="btn btn-primary">
+                                <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-primary">
                                     <i class="fas fa-edit"></i> Edit Employee
                                 </a>
-                                <a href="{{ route('employee.index') }}" class="btn btn-secondary">
+                                <a href="{{ route('employees.index') }}" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i> Back to List
                                 </a>
+                                <button type="button" class="btn btn-danger delete-employee-btn" data-id="{{ $employee->id }}" data-name="{{ $employee->first_name }} {{ $employee->last_name }}" data-email="{{ $employee->email }}">
+                                    <i class="fas fa-trash"></i> Delete Employee
+                                </button>
                             </div>
                         </div>
                         <div class="card-body">
@@ -145,4 +148,56 @@
     </section>
 </div>
 
+<!-- Hidden form for delete operations -->
+<form id="delete-employee-form" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
 @endsection
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    // Check if jQuery and SweetAlert2 are loaded
+    if (typeof $ === 'undefined') {
+        console.error('jQuery is not loaded');
+        return;
+    }
+
+    if (typeof Swal === 'undefined') {
+        console.error('SweetAlert2 is not loaded');
+        return;
+    }
+
+    $(document).on('click', '.delete-employee-btn', function() {
+        const employeeId = $(this).data('id');
+        const employeeName = $(this).data('name');
+        const employeeEmail = $(this).data('email');
+
+        Swal.fire({
+            title: '<strong>Delete Employee?</strong>',
+            html: `<p>Are you sure you want to delete the employee: <strong>${employeeName}</strong> (${employeeEmail})?</p>
+                  <p><strong>Note:</strong> This action cannot be undone and all related records will be permanently removed.</p>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-trash"></i> Yes, delete employee',
+            cancelButtonText: '<i class="fas fa-times"></i> Cancel',
+            reverseButtons: true,
+            customClass: {
+                popup: 'border-radius-lg',
+                title: 'text-capitalize'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = $('#delete-employee-form');
+                form.attr('action', '{{ url('employees') }}/' + employeeId);
+                form.submit();
+            }
+        });
+    });
+});
+</script>
+@endpush

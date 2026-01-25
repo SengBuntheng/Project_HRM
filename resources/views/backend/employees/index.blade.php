@@ -104,38 +104,56 @@
     </section>
     <!-- /.content -->
   </div>
+
+  <!-- Hidden form for delete operations -->
+  <form id="delete-employee-form" method="POST" style="display: none;">
+      @csrf
+      @method('DELETE')
+  </form>
 @endsection
 
-<!-- Hidden form for delete operations -->
-<form id="delete-employee-form" method="POST" style="display: none;">
-    @csrf
-    @method('DELETE')
-</form>
-
+@push('scripts')
 <script>
 $(document).ready(function() {
-    $('.delete-employee-btn').on('click', function() {
+    // Check if jQuery and SweetAlert2 are loaded
+    if (typeof $ === 'undefined') {
+        console.error('jQuery is not loaded');
+        return;
+    }
+
+    if (typeof Swal === 'undefined') {
+        console.error('SweetAlert2 is not loaded');
+        return;
+    }
+
+    $(document).on('click', '.delete-employee-btn', function() {
         const employeeId = $(this).data('id');
         const employeeName = $(this).data('name');
         const employeeEmail = $(this).data('email');
-        
+
         Swal.fire({
-            title: 'Delete Employee?',
+            title: '<strong>Delete Employee?</strong>',
             html: `<p>Are you sure you want to delete the employee: <strong>${employeeName}</strong> (${employeeEmail})?</p>
                   <p><strong>Note:</strong> This action cannot be undone and all related records will be permanently removed.</p>`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
+            confirmButtonColor: '#dc3545',
             cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, delete employee',
-            cancelButtonText: 'Cancel'
+            confirmButtonText: '<i class="fas fa-trash"></i> Yes, delete employee',
+            cancelButtonText: '<i class="fas fa-times"></i> Cancel',
+            reverseButtons: true,
+            customClass: {
+                popup: 'border-radius-lg',
+                title: 'text-capitalize'
+            }
         }).then((result) => {
             if (result.isConfirmed) {
                 const form = $('#delete-employee-form');
-                form.attr('action', '/employees/' + employeeId);
+                form.attr('action', '{{ url('employees') }}/' + employeeId);
                 form.submit();
             }
         });
     });
 });
 </script>
+@endpush

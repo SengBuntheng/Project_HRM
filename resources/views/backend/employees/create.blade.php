@@ -15,7 +15,7 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard.index') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('employee.index') }}">Employees</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('employees.index') }}">Employees</a></li>
                         <li class="breadcrumb-item active">Create Employee</li>
                     </ol>
                 </div>
@@ -32,7 +32,7 @@
                             <h3 class="card-title">Add New Employee</h3>
                         </div>
                         <div class="card-body">
-                            <form action="{{ route('employee.store') }}" method="POST">
+                            <form action="{{ route('employees.store') }}" method="POST">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-6">
@@ -139,7 +139,7 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-save"></i> Save Employee
                                     </button>
-                                    <a href="{{ route('employee.index') }}" class="btn btn-secondary">
+                                    <a href="{{ route('employees.index') }}" class="btn btn-secondary">
                                         <i class="fas fa-times"></i> Cancel
                                     </a>
                                 </div>

@@ -15,7 +15,7 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard.index') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('employee.index') }}">Employees</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('employees.index') }}">Employees</a></li>
                         <li class="breadcrumb-item active">Edit Employee</li>
                     </ol>
                 </div>
@@ -32,7 +32,7 @@
                             <h3 class="card-title">Edit Employee Details</h3>
                         </div>
                         <div class="card-body">
-                            <form action="{{ route('employee.update', $employee->id) }}" method="POST">
+                            <form action="{{ route('employees.update', $employee->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
                                 <div class="row">
@@ -140,7 +140,7 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-sync-alt"></i> Update Employee
                                     </button>
-                                    <a href="{{ route('employee.index') }}" class="btn btn-secondary">
+                                    <a href="{{ route('employees.index') }}" class="btn btn-secondary">
                                         <i class="fas fa-times"></i> Cancel
                                     </a>
                                 </div>

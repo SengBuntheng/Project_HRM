@@ -52,6 +52,8 @@
 
 <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 
+@stack('scripts')
+
 <!-- <script>
 $(function () {
 
