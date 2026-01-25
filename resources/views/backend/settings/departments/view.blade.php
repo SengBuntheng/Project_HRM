@@ -70,21 +70,17 @@
             </div>
           </div>
 
-          <div class="card-footer d-flex justify-content-between">
+          <div class="card-footer d-flex justify-content-between align-items-center">
             <div>
-              <a href="{{url('department/'.$department->department_id.'/edit')}}" class="btn btn-outline-primary">
-                <i class="far fa-edit"></i> Edit
+              <a href="{{url('department/'.$department->department_id.'/edit')}}" class="btn btn-primary">
+                <i class="far fa-edit mr-2"></i> Edit Department
               </a>
-              <form action="{{ url('/department/'.$department->department_id) }}" method="POST" style="display:inline" onsubmit="return confirm('Are you sure you want to delete this department? This action cannot be undone.');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-outline-danger ml-2">
-                  <i class="fas fa-trash-alt"></i> Delete
-                </button>
-              </form>
+              <button type="button" class="btn btn-danger ml-2" onclick="confirmDelete({{ $department->department_id }}, '{{ $department->department_name }}', '{{ $department->department_code }}')">
+                <i class="fas fa-trash-alt mr-2"></i> Delete Department
+              </button>
             </div>
             <a href="{{url('/department')}}" class="btn btn-secondary">
-              <i class="fas fa-list"></i> View All
+              <i class="fas fa-list mr-2"></i> View All
             </a>
           </div>
         </div>
@@ -93,5 +89,72 @@
     </section>
 
   </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-danger text-white border-0">
+          <h5 class="modal-title" id="deleteConfirmModalLabel">
+            <i class="fas fa-exclamation-circle mr-2"></i> Confirm Delete
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body pt-4">
+          <p class="text-dark font-weight-bold mb-3">
+            Are you sure you want to permanently delete this department?
+          </p>
+          <div class="alert alert-warning border-left-warning" role="alert">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            <strong>Warning:</strong> This action cannot be undone.
+          </div>
+          <div class="card border-left-danger">
+            <div class="card-body">
+              <p class="mb-2">
+                <strong>Code:</strong>
+                <span class="badge badge-light border border-danger text-danger" id="deleteCode"></span>
+              </p>
+              <p class="mb-2">
+                <strong>Name:</strong>
+                <span class="text-dark" id="deleteName"></span>
+              </p>
+              <p class="mb-0">
+                <strong>Status:</strong>
+                <span id="deleteStatus"></span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times mr-2"></i> Cancel
+          </button>
+          <form id="deleteForm" method="POST" style="display:inline">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">
+              <i class="fas fa-trash-alt mr-2"></i> Delete Permanently
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function confirmDelete(departmentId, departmentName, departmentCode) {
+      // Populate modal with department details
+      document.getElementById('deleteCode').textContent = departmentCode;
+      document.getElementById('deleteName').textContent = departmentName;
+
+      // Set form action
+      document.getElementById('deleteForm').action = '/department/' + departmentId;
+
+      // Show modal
+      $('#deleteConfirmModal').modal('show');
+    }
+  </script>
 
 @endsection
