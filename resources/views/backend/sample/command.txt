@@ -1,0 +1,12 @@
+// create controller with resource
+php artisan make:controller backend/DepartmentController -r
+
+//seeder database
+php artisan make:seeder DepartmentSeeder
+
+//run seeder
+php artisan db:seed
+or
+php artisan db:seed --class=DepartmentSeeder
+
+Hello
