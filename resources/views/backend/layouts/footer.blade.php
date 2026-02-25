@@ -82,12 +82,15 @@ $(function () {
 });
 </script> -->
 
+<div id="toast-data" data-errors='@json($errors->all())' data-success='@json(session('toast_success'))'></div>
+
 <script>
 $(function () {
+    const toastDataEl = document.getElementById('toast-data');
+    const errorMessages = toastDataEl ? JSON.parse(toastDataEl.dataset.errors || '[]') : [];
+    const toastSuccess = toastDataEl ? JSON.parse(toastDataEl.dataset.success || 'null') : null;
 
-    @if ($errors->any())
-        let errorMessages = @json($errors->all());
-
+    if (Array.isArray(errorMessages) && errorMessages.length > 0) {
         let errorHtml = '<ul style="margin:0;padding-left:18px;">';
         errorMessages.forEach(function (msg) {
             errorHtml += '<li>' + msg + '</li>';
@@ -102,19 +105,18 @@ $(function () {
             delay: 6000,
             icon: 'fas fa-times-circle'
         });
-    @endif
+    }
 
-    @if (session('toast_success'))
+    if (toastSuccess) {
         $(document).Toasts('create', {
             class: 'bg-success',
             title: 'Success',
-            body: @json(session('toast_success')),
+            body: toastSuccess,
             autohide: true,
             delay: 3000,
             icon: 'fas fa-check-circle'
         });
-    @endif
-
+    }
 });
 </script>
 

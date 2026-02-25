@@ -132,7 +132,7 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 const form = $('#delete-form');
-                form.attr('action', '{{ url('department') }}/' + departmentId);
+                form.attr('action', '{{ url("department") }}/' + departmentId);
                 form.submit();
             }
         });

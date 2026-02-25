@@ -32,7 +32,7 @@
                             <h3 class="card-title">Add New Employee</h3>
                         </div>
                         <div class="card-body">
-                            <form action="{{ route('employees.store') }}" method="POST">
+                            <form action="{{ route('employees.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-6">
@@ -68,7 +68,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="phone">Phone</label>
-                                            <input type="text" name="phone" id="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone') }}">
+                                            <input type="tel" name="phone" id="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone') }}" inputmode="numeric" pattern="[0-9]*" title="Numbers only" minlength="9" maxlength="10" onfocus="this.dataset.warned='0'" oninput="if (/[^0-9]/.test(this.value)) { if (this.dataset.warned !== '1') { alert('Numbers only'); this.dataset.warned = '1'; } this.value = this.value.replace(/[^0-9]/g, ''); } if (this.value.length > 10) { this.value = this.value.slice(0, 10); }">
                                             @error('phone')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -79,18 +79,46 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="position">Position <span class="text-danger">*</span></label>
-                                            <input type="text" name="position" id="position" class="form-control @error('position') is-invalid @enderror" value="{{ old('position') }}" required>
-                                            @error('position')
+                                            <label for="profile_photo">Profile Photo</label>
+                                            <input type="file" name="profile_photo" id="profile_photo" class="form-control-file @error('profile_photo') is-invalid @enderror" accept="image/*">
+                                            @error('profile_photo')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="d-block">Preview</label>
+                                            <img id="profile_photo_preview" alt="Preview" class="img-thumbnail" style="max-height: 120px; display: none;">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="position_id">Position <span class="text-danger">*</span></label>
+                                            <select name="position_id" id="position_id" class="form-control @error('position_id') is-invalid @enderror" required>
+                                                <option value="">Select Position</option>
+                                                @foreach($positions as $pos)
+                                                    <option value="{{ $pos->id }}" {{ old('position_id') == $pos->id ? 'selected' : '' }}>{{ $pos->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('position_id')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="department">Department <span class="text-danger">*</span></label>
-                                            <input type="text" name="department" id="department" class="form-control @error('department') is-invalid @enderror" value="{{ old('department') }}" required>
-                                            @error('department')
+                                            <label for="department_id">Department <span class="text-danger">*</span></label>
+                                            <select name="department_id" id="department_id" class="form-control @error('department_id') is-invalid @enderror" required>
+                                                <option value="">Select Department</option>
+                                                @foreach($departments as $dpt)
+                                                    <option value="{{ $dpt->department_id }}" {{ old('department_id') == $dpt->department_id ? 'selected' : '' }}>{{ $dpt->department_name }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('department_id')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -153,3 +181,23 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+$(function() {
+    $('#profile_photo').on('change', function() {
+        const file = this.files && this.files[0];
+        const preview = $('#profile_photo_preview');
+        if (!file) {
+            preview.hide().attr('src', '');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.attr('src', e.target.result).show();
+        };
+        reader.readAsDataURL(file);
+    });
+});
+</script>
+@endpush

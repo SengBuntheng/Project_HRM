@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_photo_path',
     ];
 
     /**
@@ -44,5 +46,27 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getProfilePhotoUrlAttribute()
+    {
+        if ($this->profile_photo_path) {
+            return Storage::url($this->profile_photo_path);
+        }
+
+        $initials = strtoupper(trim(substr($this->name ?? '', 0, 2)));
+        if ($initials === '') {
+            $initials = '?';
+        }
+
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160">'
+            . '<rect width="100%" height="100%" fill="#6c757d"/>'
+            . '<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" '
+            . 'font-family="Arial, sans-serif" font-size="64" fill="#ffffff">'
+            . $initials
+            . '</text>'
+            . '</svg>';
+
+        return 'data:image/svg+xml;utf8,' . rawurlencode($svg);
     }
 }

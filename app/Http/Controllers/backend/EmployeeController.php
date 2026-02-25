@@ -4,7 +4,10 @@ namespace App\Http\Controllers\backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
+use App\Models\Position;
+use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
@@ -17,7 +20,10 @@ class EmployeeController extends Controller
 
     public function create()
     {
-        return view('backend.employees.create');
+        $positions = Position::where('status', 'active')->get();
+        $departments = Department::orderBy('department_name')->get();
+
+        return view('backend.employees.create', compact('positions', 'departments'));
     }
 
     public function store(Request $request)
@@ -26,15 +32,30 @@ class EmployeeController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:employees,email',
-            'phone' => 'nullable|string|max:20',
-            'position' => 'required|string|max:255',
-            'department' => 'required|string|max:255',
+            'phone' => 'nullable|regex:/^\d{9,10}$/',
+            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'position_id' => 'required|exists:positions,id',
+            'department_id' => 'required|exists:departments,department_id',
             'salary' => 'required|numeric|min:0',
             'hire_date' => 'required|date',
             'status' => 'required|in:active,inactive,terminated',
         ]);
 
-        Employee::create($request->all());
+        $position = Position::find($request->input('position_id'));
+        $department = Department::where('department_id', $request->input('department_id'))->first();
+
+        $data = $request->only(['first_name','last_name','email','phone','salary','hire_date','status']);
+        $data['position_id'] = $request->input('position_id');
+        $data['department_id'] = $request->input('department_id');
+        // keep legacy string fields for compatibility
+        $data['position'] = $position ? $position->name : null;
+        $data['department'] = $department ? $department->department_name : null;
+
+        if ($request->hasFile('profile_photo')) {
+            $data['profile_photo_path'] = $request->file('profile_photo')->store('employees/photos', 'public');
+        }
+
+        Employee::create($data);
 
         return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
     }
@@ -46,7 +67,10 @@ class EmployeeController extends Controller
 
     public function edit(Employee $employee)
     {
-        return view('backend.employees.edit', compact('employee'));
+        $positions = Position::where('status', 'active')->get();
+        $departments = Department::orderBy('department_name')->get();
+
+        return view('backend.employees.edit', compact('employee','positions','departments'));
     }
 
     public function update(Request $request, Employee $employee)
@@ -55,15 +79,32 @@ class EmployeeController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:employees,email,' . $employee->id,
-            'phone' => 'nullable|string|max:20',
-            'position' => 'required|string|max:255',
-            'department' => 'required|string|max:255',
+            'phone' => 'nullable|regex:/^\d{9,10}$/',
+            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'position_id' => 'required|exists:positions,id',
+            'department_id' => 'required|exists:departments,department_id',
             'salary' => 'required|numeric|min:0',
             'hire_date' => 'required|date',
             'status' => 'required|in:active,inactive,terminated',
         ]);
 
-        $employee->update($request->all());
+        $position = Position::find($request->input('position_id'));
+        $department = Department::where('department_id', $request->input('department_id'))->first();
+
+        $data = $request->only(['first_name','last_name','email','phone','salary','hire_date','status']);
+        $data['position_id'] = $request->input('position_id');
+        $data['department_id'] = $request->input('department_id');
+        $data['position'] = $position ? $position->name : null;
+        $data['department'] = $department ? $department->department_name : null;
+
+        if ($request->hasFile('profile_photo')) {
+            if ($employee->profile_photo_path) {
+                Storage::disk('public')->delete($employee->profile_photo_path);
+            }
+            $data['profile_photo_path'] = $request->file('profile_photo')->store('employees/photos', 'public');
+        }
+
+        $employee->update($data);
 
         return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
     }

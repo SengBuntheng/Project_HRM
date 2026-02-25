@@ -15,7 +15,7 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('dashboard.index') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('employee.index') }}">Employees</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('employees.index') }}">Employees</a></li>
                         <li class="breadcrumb-item active">View Employee</li>
                     </ol>
                 </div>
@@ -63,6 +63,17 @@
                             </div>
 
                             <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group mb-3">
+                                        <label class="text-muted">Profile Photo:</label>
+                                        <div>
+                                            <img src="{{ $employee->profile_photo_url }}" alt="{{ $employee->first_name }}" class="img-thumbnail" style="max-height: 160px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
                                         <label class="text-muted">First Name:</label>
@@ -100,13 +111,13 @@
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
                                         <label class="text-muted">Position:</label>
-                                        <p class="mb-0">{{ $employee->position }}</p>
+                                        <p class="mb-0">{{ optional($employee->positionRelation)->name ?? $employee->position }}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
                                         <label class="text-muted">Department:</label>
-                                        <p class="mb-0">{{ $employee->department }}</p>
+                                        <p class="mb-0">{{ optional($employee->departmentRelation)->department_name ?? $employee->department }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -193,7 +204,7 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 const form = $('#delete-employee-form');
-                form.attr('action', '{{ url('employees') }}/' + employeeId);
+                form.attr('action', '{{ url("employees") }}/' + employeeId);
                 form.submit();
             }
         });

@@ -1,7 +1,7 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index3.html" class="brand-link">
+    <a href="/" class="brand-link">
       <img src="{{asset('assets/dist/img/AdminLTELogo.png')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-light">SU30 PAYROLL</span>
     </a>
@@ -11,10 +11,13 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{{asset('/assets/image/settings.png')}}" class="img-circle elevation-2" alt="User Image">
+          @php
+            $sidebarUser = auth()->user() ?: \App\Models\User::query()->first();
+          @endphp
+          <img src="{{ $sidebarUser ? $sidebarUser->profile_photo_url : asset('/assets/image/settings.png') }}" class="img-circle elevation-2" alt="User Image" style="height: 32px; width: 32px; object-fit: cover;">
         </div>
         <div class="info">
-          <a href="#" class="d-block">Meun Chamroeun</a>
+          <a href="{{ route('profile.edit') }}" class="d-block">{{ $sidebarUser ? $sidebarUser->name : 'Guest' }}</a>
         </div>
       </div>
 
@@ -45,7 +48,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{url('/')}}" class="nav-link @yield('d_active')">
+                <a href="/" class="nav-link @yield('d_active')">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Dashboard</p>
                 </a>
@@ -65,7 +68,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{url('/employee')}}" class="nav-link @yield('e_active')">
+                <a href="{{ route('employees.index') }}" class="nav-link @yield('e_active')">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Employee</p>
                 </a>
@@ -94,8 +97,8 @@
             </ul>
           </li>
 
-          <li class="nav-item">
-            <a href="#" class="nav-link">
+          <li class="nav-item @yield('p_menu-open')">
+            <a href="#" class="nav-link @yield('p_active')">
               <i class="nav-icon fas fa-circle"></i>
               <p>
               Position MGM
@@ -104,7 +107,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{{ route('positions.index') }}" class="nav-link @yield('p_active')">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Position</p>
                 </a>
